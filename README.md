@@ -20,6 +20,7 @@ This repository is an open-source starter for Selena with:
 - a Cloudflare Worker API
 - a HeySalad-branded landing page
 - a working local human-mode screen recorder
+- an unpacked Chrome extension MVP with floating controls
 - a job creation endpoint for recording requests
 - MVP architecture and research docs
 
@@ -47,7 +48,20 @@ To record your screen on this Mac, open the page and click `Start recording`.
 ```bash
 pnpm typecheck
 pnpm test
+pnpm build:extension
 ```
+
+## Chrome Extension
+
+Selena also includes an unpacked Chrome extension MVP in `extension/`.
+
+Build it with:
+
+```bash
+pnpm build:extension
+```
+
+Then open `chrome://extensions`, enable `Developer mode`, choose `Load unpacked`, and select `/Users/chilumbam/heysalad-selena/extension`.
 
 ## API
 

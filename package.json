@@ -5,15 +5,17 @@
 	"private": true,
 	"license": "Apache-2.0",
 	"scripts": {
+		"build:extension": "tsc -p extension/tsconfig.json",
 		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
 		"test": "vitest",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc --noEmit && tsc -p extension/tsconfig.json --noEmit",
 		"cf-typegen": "wrangler types"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.12.4",
+		"@types/chrome": "^0.1.40",
 		"@types/node": "^25.6.0",
 		"typescript": "^5.5.2",
 		"vitest": "~3.2.0",
