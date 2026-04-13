@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="description"
+			content="Selena is the HeySalad screen recording agent for human-led and AI-led walkthroughs."
+		/>
+		<title>Selena | HeySalad Screen Recording Agent</title>
+		<link
+			rel="preconnect"
+			href="https://fonts.googleapis.com"
+		/>
+		<link
+			rel="preconnect"
+			href="https://fonts.gstatic.com"
+			crossorigin
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Grandstander:wght@700;900&family=Figtree:wght@400;600&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--hs-cherry: #ed4c4c;
+				--hs-red: #fe6c60;
+				--hs-dark-peach: #faa09a;
+				--hs-light-peach: #ffd0cd;
+				--hs-black: #000000;
+				--hs-cream: #fff8f5;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				font-family: "Figtree", sans-serif;
+				background:
+					radial-gradient(circle at top left, rgba(237, 76, 76, 0.18), transparent 32rem),
+					radial-gradient(circle at bottom right, rgba(250, 160, 154, 0.34), transparent 30rem),
+					var(--hs-cream);
+				color: var(--hs-black);
+			}
+
+			body::before,
+			body::after {
+				content: "";
+				position: fixed;
+				inset: auto;
+				width: 18rem;
+				height: 18rem;
+				border-radius: 999px;
+				background: linear-gradient(135deg, rgba(237, 76, 76, 0.2), rgba(255, 208, 205, 0.2));
+				filter: blur(12px);
+				z-index: -1;
+				animation: drift 14s ease-in-out infinite;
+			}
+
+			body::before {
+				top: 4rem;
+				right: -6rem;
+			}
+
+			body::after {
+				bottom: 2rem;
+				left: -4rem;
+				animation-delay: -6s;
+			}
+
+			@keyframes drift {
+				0%,
+				100% {
+					transform: translateY(0) rotate(0deg);
+				}
+
+				50% {
+					transform: translateY(-18px) rotate(4deg);
+				}
+			}
+
+			main {
+				max-width: 1120px;
+				margin: 0 auto;
+				padding: 2rem 1.25rem 4rem;
+			}
+
+			.hero {
+				padding: 1rem 0 2rem;
+			}
+
+			.kicker {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.55rem 0.9rem;
+				border-radius: 999px;
+				background: rgba(255, 255, 255, 0.84);
+				border: 1px solid rgba(237, 76, 76, 0.15);
+				box-shadow: 0 12px 30px rgba(237, 76, 76, 0.08);
+				font-size: 0.92rem;
+			}
+
+			.kicker strong {
+				color: var(--hs-cherry);
+			}
+
+			h1 {
+				margin: 1.2rem 0 0.7rem;
+				max-width: 12ch;
+				font-family: "Grandstander", cursive;
+				font-size: clamp(3rem, 7vw, 6rem);
+				line-height: 0.94;
+				letter-spacing: -0.05em;
+			}
+
+			.lead {
+				max-width: 48rem;
+				font-size: 1.1rem;
+				line-height: 1.7;
+			}
+
+			.cta-row {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.9rem;
+				margin-top: 1.6rem;
+			}
+
+			button {
+				border: none;
+				border-radius: 999px;
+				padding: 0.95rem 1.35rem;
+				font: inherit;
+				font-weight: 600;
+				cursor: pointer;
+				transition:
+					transform 160ms ease,
+					box-shadow 160ms ease,
+					background 160ms ease;
+			}
+
+			button:hover {
+				transform: translateY(-1px);
+				box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+			}
+
+			.primary {
+				background: var(--hs-cherry);
+				color: #fff;
+			}
+
+			.secondary {
+				background: rgba(255, 255, 255, 0.82);
+				color: var(--hs-black);
+				border: 1px solid rgba(0, 0, 0, 0.08);
+			}
+
+			.grid {
+				display: grid;
+				gap: 1rem;
+				grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+				margin: 2rem 0 1.5rem;
+			}
+
+			.card,
+			.panel {
+				background: rgba(255, 255, 255, 0.9);
+				border: 1px solid rgba(0, 0, 0, 0.08);
+				border-radius: 28px;
+				padding: 1.35rem;
+				box-shadow: 0 18px 42px rgba(0, 0, 0, 0.06);
+				backdrop-filter: blur(8px);
+			}
+
+			.card h2,
+			.panel h2 {
+				margin-top: 0;
+				font-family: "Grandstander", cursive;
+				font-size: 1.7rem;
+			}
+
+			.card p {
+				line-height: 1.6;
+			}
+
+			ul {
+				padding-left: 1.15rem;
+				line-height: 1.6;
+			}
+
+			.panel {
+				display: grid;
+				gap: 1rem;
+				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			}
+
+			pre {
+				margin: 0;
+				padding: 1rem;
+				border-radius: 22px;
+				background: #130807;
+				color: #fff2f1;
+				overflow: auto;
+				min-height: 260px;
+				font-size: 0.9rem;
+				line-height: 1.55;
+			}
+
+			footer {
+				margin-top: 2rem;
+				font-size: 0.95rem;
+				color: rgba(0, 0, 0, 0.72);
+			}
+
+			@media (max-width: 720px) {
+				h1 {
+					max-width: 9ch;
+				}
+
+				main {
+					padding-inline: 1rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<section class="hero">
+				<div class="kicker"><strong>HeySalad</strong> Selena is live as a launch-ready blueprint.</div>
+				<h1>Record it yourself or send Selena.</h1>
+				<p class="lead">
+					Selena is a HeySalad screen recording agent for walkthroughs, decks, and product demos. The fast
+					path is a split system: humans start local browser capture, while AI runs recordings inside remote
+					browsers and desktops that Selena controls.
+				</p>
+				<div class="cta-row">
+					<button class="primary" id="show-blueprint" type="button">Load Selena blueprint</button>
+					<button class="secondary" id="create-ai-job" type="button">Create AI demo job</button>
+				</div>
+			</section>
+
+			<section class="grid" aria-label="Selena modes">
+				<article class="card">
+					<h2>Human Mode</h2>
+					<p>
+						Use Selena like Loom. The user clicks record, selects a screen, and uploads the capture directly
+						to cloud video storage.
+					</p>
+					<ul>
+						<li>Best first launch</li>
+						<li>No browser extension required for MVP</li>
+						<li>Fits pitch decks and app walkthroughs today</li>
+					</ul>
+				</article>
+				<article class="card">
+					<h2>Agent Mode</h2>
+					<p>
+						Send Selena to run a walkthrough in a remote browser first, then expand to remote desktop for
+						native apps and full desktop demos.
+					</p>
+					<ul>
+						<li>Browser automation ships before desktop automation</li>
+						<li>Remote execution avoids local permission blockers</li>
+						<li>Ideal for repeatable product tours</li>
+					</ul>
+				</article>
+				<article class="card">
+					<h2>Fastest Route Online</h2>
+					<p>
+						Ship the browser recorder first, then add Selena-run browser sessions. Only build full remote
+						desktop capture once those two lanes are stable.
+					</p>
+					<ul>
+						<li>Worker API + landing page now</li>
+						<li>Cloudflare Stream next</li>
+						<li>Remote desktop after browser traction</li>
+					</ul>
+				</article>
+			</section>
+
+			<section class="panel">
+				<div>
+					<h2>API Preview</h2>
+					<pre id="blueprint-output">Press “Load Selena blueprint” to inspect the live Worker JSON.</pre>
+				</div>
+				<div>
+					<h2>Launch Plan</h2>
+					<pre id="plan-output">Press “Create AI demo job” to generate a sample Selena recording job.</pre>
+				</div>
+			</section>
+
+			<footer>
+				Selena is scoped to ship fast: browser-based recording first, agent-run remote sessions second, desktop
+				capture third.
+			</footer>
+		</main>
+		<script>
+			const blueprintOutput = document.getElementById("blueprint-output");
+			const planOutput = document.getElementById("plan-output");
+
+			async function loadBlueprint() {
+				const response = await fetch("/api/blueprint");
+				const data = await response.json();
+				blueprintOutput.textContent = JSON.stringify(data, null, 2);
+
+				const planResponse = await fetch("/api/launch-plan");
+				const planData = await planResponse.json();
+				planOutput.textContent = JSON.stringify(planData, null, 2);
+			}
+
+			async function createAiJob() {
+				const response = await fetch("/api/jobs", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify({
+						mode: "ai",
+						surface: "browser",
+						target: "Pitch deck walkthrough",
+					}),
+				});
+				const data = await response.json();
+				planOutput.textContent = JSON.stringify(data, null, 2);
+			}
+
+			document.getElementById("show-blueprint").addEventListener("click", loadBlueprint);
+			document.getElementById("create-ai-job").addEventListener("click", createAiJob);
+		</script>
+	</body>
+</html>

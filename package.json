@@ -1,0 +1,30 @@
+{
+	"name": "heysalad-selena",
+	"version": "0.1.0",
+	"description": "Selena, the HeySalad screen recording agent for human-led and AI-led walkthroughs.",
+	"private": true,
+	"license": "Apache-2.0",
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"test": "vitest",
+		"typecheck": "tsc --noEmit",
+		"cf-typegen": "wrangler types"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.12.4",
+		"@types/node": "^25.6.0",
+		"typescript": "^5.5.2",
+		"vitest": "~3.2.0",
+		"wrangler": "^4.82.1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Hey-Salad/agent-selena.git"
+	},
+	"bugs": {
+		"url": "https://github.com/Hey-Salad/agent-selena/issues"
+	},
+	"homepage": "https://github.com/Hey-Salad/agent-selena#readme"
+}

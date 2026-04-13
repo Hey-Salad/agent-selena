@@ -1,0 +1,60 @@
+openapi: 3.1.0
+info:
+  title: Selena API
+  version: 0.1.0
+  description: API for the HeySalad Selena screen recording agent.
+servers:
+  - url: https://heysalad-selena.example.workers.dev
+paths:
+  /api/health:
+    get:
+      summary: Health check for Selena
+      operationId: getHealth
+      responses:
+        "200":
+          description: Selena service status
+  /api/blueprint:
+    get:
+      summary: Product blueprint and recommendation
+      operationId: getBlueprint
+      responses:
+        "200":
+          description: Blueprint payload
+  /api/recording-modes:
+    get:
+      summary: Available Selena operating modes
+      operationId: getRecordingModes
+      responses:
+        "200":
+          description: Recording mode list
+  /api/launch-plan:
+    get:
+      summary: Phased launch plan
+      operationId: getLaunchPlan
+      responses:
+        "200":
+          description: Launch phases
+  /api/jobs:
+    post:
+      summary: Create a Selena recording job
+      operationId: createJob
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  enum: [human, ai]
+                surface:
+                  type: string
+                  enum: [browser, desktop]
+                actor:
+                  type: string
+                target:
+                  type: string
+      responses:
+        "201":
+          description: Job created
