@@ -63,6 +63,8 @@ pnpm build:extension
 
 Then open `chrome://extensions`, enable `Developer mode`, choose `Load unpacked`, and select `/Users/chilumbam/heysalad-selena/extension`.
 
+The toolbar click now opens a Selena popup first, then injects the floating recorder into the current supported page.
+
 ## API
 
 - `GET /api/health`

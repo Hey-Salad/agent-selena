@@ -4,6 +4,7 @@ This is the unpacked Chrome extension MVP for Selena.
 
 ## What It Does
 
+- Opens a polished Selena popup when you click the extension icon
 - Adds a floating Selena recorder panel to web pages
 - Records the selected screen, window, or tab
 - Optionally includes microphone audio
@@ -32,3 +33,8 @@ pnpm build:extension
 4. Select `/Users/chilumbam/heysalad-selena/extension`
 
 Then click the Selena extension icon on any normal web page to open the floating recorder.
+
+## Notes
+
+- If you click the icon on `chrome://` pages, Chrome will block injection and Selena will tell you to switch tabs.
+- The popup now handles tabs that were already open before the extension was installed by injecting the recorder on demand.
