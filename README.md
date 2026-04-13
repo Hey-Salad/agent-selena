@@ -19,6 +19,7 @@ This repository is an open-source starter for Selena with:
 
 - a Cloudflare Worker API
 - a HeySalad-branded landing page
+- a working local human-mode screen recorder
 - a job creation endpoint for recording requests
 - MVP architecture and research docs
 
@@ -38,6 +39,8 @@ pnpm dev
 ```
 
 Then open `http://localhost:8787`.
+
+To record your screen on this Mac, open the page and click `Start recording`.
 
 ## Development
 

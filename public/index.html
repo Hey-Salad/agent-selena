@@ -197,6 +197,83 @@
 				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 			}
 
+			.recorder-panel {
+				align-items: start;
+			}
+
+			.recorder-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.8rem;
+				margin: 1rem 0;
+			}
+
+			.status-pill {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.6rem 0.9rem;
+				border-radius: 999px;
+				background: rgba(255, 208, 205, 0.75);
+				color: #6b1f1f;
+				font-size: 0.92rem;
+			}
+
+			.status-pill::before {
+				content: "";
+				width: 0.7rem;
+				height: 0.7rem;
+				border-radius: 999px;
+				background: var(--hs-cherry);
+				box-shadow: 0 0 0 4px rgba(237, 76, 76, 0.12);
+			}
+
+			button:disabled {
+				cursor: not-allowed;
+				opacity: 0.55;
+				transform: none;
+				box-shadow: none;
+			}
+
+			.link-button {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 999px;
+				padding: 0.95rem 1.35rem;
+				background: #130807;
+				color: #fff2f1;
+				font-weight: 600;
+				text-decoration: none;
+			}
+
+			.recorder-help {
+				margin: 0.8rem 0 0;
+				line-height: 1.6;
+				color: rgba(0, 0, 0, 0.72);
+			}
+
+			.preview-shell {
+				display: grid;
+				gap: 0.8rem;
+			}
+
+			.preview-shell p {
+				margin: 0;
+				line-height: 1.6;
+			}
+
+			video {
+				width: 100%;
+				min-height: 280px;
+				border-radius: 24px;
+				background:
+					linear-gradient(135deg, rgba(237, 76, 76, 0.18), rgba(255, 208, 205, 0.36)),
+					#120807;
+				border: 1px solid rgba(0, 0, 0, 0.08);
+				object-fit: cover;
+			}
+
 			pre {
 				margin: 0;
 				padding: 1rem;
@@ -281,6 +358,31 @@
 				</article>
 			</section>
 
+			<section class="panel recorder-panel" aria-label="Selena recorder">
+				<div>
+					<h2>Record On This Mac</h2>
+					<p>
+						Use Selena in human mode right now. Click start, choose a screen, window, or tab, then stop
+						recording when you are done. Selena will prepare a local preview and a download file.
+					</p>
+					<div class="recorder-actions">
+						<button class="primary" id="start-recording" type="button">Start recording</button>
+						<button class="secondary" id="stop-recording" type="button" disabled>Stop recording</button>
+						<a class="link-button" id="download-recording" hidden>Download video</a>
+					</div>
+					<div class="status-pill" id="recording-status">Ready to record on this Mac.</div>
+					<p class="recorder-help">
+						Best in Chrome or Edge. Audio availability depends on what the browser and the selected capture
+						source allow.
+					</p>
+				</div>
+				<div class="preview-shell">
+					<h2>Preview</h2>
+					<p>The live share will appear here while recording. After you stop, the finished video will be ready to play and download.</p>
+					<video id="recording-preview" autoplay playsinline controls muted></video>
+				</div>
+			</section>
+
 			<section class="panel">
 				<div>
 					<h2>API Preview</h2>
@@ -300,6 +402,156 @@
 		<script>
 			const blueprintOutput = document.getElementById("blueprint-output");
 			const planOutput = document.getElementById("plan-output");
+			const recordingStatus = document.getElementById("recording-status");
+			const startRecordingButton = document.getElementById("start-recording");
+			const stopRecordingButton = document.getElementById("stop-recording");
+			const downloadRecordingLink = document.getElementById("download-recording");
+			const recordingPreview = document.getElementById("recording-preview");
+
+			let activeStream = null;
+			let mediaRecorder = null;
+			let recordedChunks = [];
+			let downloadUrl = "";
+
+			function getRecorderMimeType() {
+				if (typeof MediaRecorder === "undefined" || typeof MediaRecorder.isTypeSupported !== "function") {
+					return "";
+				}
+
+				const candidates = [
+					"video/webm;codecs=vp9,opus",
+					"video/webm;codecs=vp8,opus",
+					"video/webm",
+					"video/mp4;codecs=h264,aac",
+					"video/mp4",
+				];
+
+				return candidates.find((candidate) => MediaRecorder.isTypeSupported(candidate)) ?? "";
+			}
+
+			function formatBytes(byteCount) {
+				if (!byteCount) return "0 B";
+				const units = ["B", "KB", "MB", "GB"];
+				const unitIndex = Math.min(Math.floor(Math.log(byteCount) / Math.log(1024)), units.length - 1);
+				const value = byteCount / 1024 ** unitIndex;
+				return `${value.toFixed(value >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+			}
+
+			function revokeDownloadUrl() {
+				if (!downloadUrl) return;
+				URL.revokeObjectURL(downloadUrl);
+				downloadUrl = "";
+			}
+
+			function resetRecorderOutput() {
+				revokeDownloadUrl();
+				recordingPreview.srcObject = null;
+				recordingPreview.removeAttribute("src");
+				recordingPreview.load();
+				downloadRecordingLink.hidden = true;
+				downloadRecordingLink.removeAttribute("href");
+			}
+
+			function stopStreamTracks() {
+				if (!activeStream) return;
+				activeStream.getTracks().forEach((track) => track.stop());
+				activeStream = null;
+			}
+
+			function setRecorderState(isRecording) {
+				startRecordingButton.disabled = isRecording;
+				stopRecordingButton.disabled = !isRecording;
+			}
+
+			async function finalizeRecording() {
+				const mimeType = mediaRecorder?.mimeType || getRecorderMimeType() || "video/webm";
+				const extension = mimeType.includes("mp4") ? "mp4" : "webm";
+				const blob = new Blob(recordedChunks, { type: mimeType });
+
+				revokeDownloadUrl();
+				downloadUrl = URL.createObjectURL(blob);
+
+				recordingPreview.srcObject = null;
+				recordingPreview.src = downloadUrl;
+				recordingPreview.muted = false;
+				recordingPreview.controls = true;
+				recordingPreview.play().catch(() => {});
+
+				downloadRecordingLink.href = downloadUrl;
+				downloadRecordingLink.download = `selena-recording-${new Date().toISOString().replace(/[:.]/g, "-")}.${extension}`;
+				downloadRecordingLink.hidden = false;
+
+				recordingStatus.textContent = `Recording ready. Download size: ${formatBytes(blob.size)}.`;
+				recordedChunks = [];
+				mediaRecorder = null;
+				stopStreamTracks();
+				setRecorderState(false);
+			}
+
+			async function startRecording() {
+				if (!navigator.mediaDevices?.getDisplayMedia) {
+					recordingStatus.textContent = "This browser does not support screen recording.";
+					return;
+				}
+
+				if (typeof MediaRecorder === "undefined") {
+					recordingStatus.textContent = "This browser does not support MediaRecorder.";
+					return;
+				}
+
+				resetRecorderOutput();
+
+				try {
+					activeStream = await navigator.mediaDevices.getDisplayMedia({
+						video: {
+							frameRate: 30,
+						},
+						audio: true,
+					});
+
+					recordedChunks = [];
+
+					const mimeType = getRecorderMimeType();
+					mediaRecorder = mimeType ? new MediaRecorder(activeStream, { mimeType }) : new MediaRecorder(activeStream);
+
+					mediaRecorder.addEventListener("dataavailable", (event) => {
+						if (event.data && event.data.size > 0) recordedChunks.push(event.data);
+					});
+
+					mediaRecorder.addEventListener("stop", finalizeRecording);
+
+					const [videoTrack] = activeStream.getVideoTracks();
+					if (videoTrack) {
+						videoTrack.addEventListener("ended", () => {
+							if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+						});
+					}
+
+					recordingPreview.srcObject = activeStream;
+					recordingPreview.muted = true;
+					recordingPreview.play().catch(() => {});
+
+					mediaRecorder.start(1000);
+					recordingStatus.textContent = "Recording in progress. Stop recording when you are done.";
+					setRecorderState(true);
+				} catch (error) {
+					stopStreamTracks();
+					setRecorderState(false);
+					recordingStatus.textContent = `Could not start recording: ${error?.message ?? "permission denied or capture cancelled"}.`;
+				}
+			}
+
+			function stopRecording() {
+				if (!mediaRecorder || mediaRecorder.state === "inactive") {
+					recordingStatus.textContent = "There is no active recording to stop.";
+					setRecorderState(false);
+					return;
+				}
+
+				recordingStatus.textContent = "Finishing recording...";
+				stopRecordingButton.disabled = true;
+				mediaRecorder.stop();
+			}
 
 			async function loadBlueprint() {
 				const response = await fetch("/api/blueprint");
@@ -327,6 +579,8 @@
 
 			document.getElementById("show-blueprint").addEventListener("click", loadBlueprint);
 			document.getElementById("create-ai-job").addEventListener("click", createAiJob);
+			startRecordingButton.addEventListener("click", startRecording);
+			stopRecordingButton.addEventListener("click", stopRecording);
 		</script>
 	</body>
 </html>
